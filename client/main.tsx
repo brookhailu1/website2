@@ -68,9 +68,9 @@ const App = () => (
             element={
               <div className="pt-20 p-8 text-center">
                 <h1 className="text-2xl font-bold">
-                  Contact Page - 0911908407 <n />
-                    instagram - brookhailu1 <n />
-                    twitter - @brookhailu1 <n />
+                  Contact Page - 0911908407 <br />
+                  instagram - brookhailu1 <br />
+                  twitter - @brookhailu1 <br />
                 </h1>
               </div>
             }

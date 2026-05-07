@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import { submitPaymentProof } from "./routes/payment-proof";
 import {
   getAllRooms,
   getRoomById,
@@ -26,6 +27,8 @@ import {
   logout,
 } from "./routes/auth";
 
+process.loadEnvFile?.();
+
 export function createServer() {
   const app = express();
 
@@ -41,6 +44,7 @@ export function createServer() {
 
   // Demo route
   app.get("/api/demo", handleDemo);
+  app.post("/api/payment-proof", submitPaymentProof);
 
   // Authentication routes
   app.post("/api/auth/register", register);

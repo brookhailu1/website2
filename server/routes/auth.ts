@@ -41,8 +41,9 @@ const mockPasswords: Record<string, string> = {
     "$2a$10$rQZ8J8VNvU5KqF5RnK1N2.8F8xF5J8ZQF5RnK1N2.8F8xF5J8ZQF5",
 };
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const JWT_EXPIRES_IN = "7d";
+
+const getJwtSecret = () => process.env.JWT_SECRET || "your-secret-key";
 
 // Generate JWT token
 const generateToken = (user: User): string => {
@@ -52,7 +53,7 @@ const generateToken = (user: User): string => {
       email: user.email,
       role: user.role,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: JWT_EXPIRES_IN },
   );
 };
@@ -207,7 +208,7 @@ export const verifyToken: RequestHandler = (req, res, next) => {
       return res.status(401).json(response);
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, getJwtSecret()) as any;
     const user = mockUsers.find((u) => u.id === decoded.id);
 
     if (!user) {

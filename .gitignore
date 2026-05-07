@@ -24,12 +24,6 @@ dist-ssr
 *.sw?
 
 .config/
-.env .env.* !.env.example
-.env echo 
-.env echo 
-.env.*
-!.env.example
-.env
 .env
 .env.*
 !.env.example

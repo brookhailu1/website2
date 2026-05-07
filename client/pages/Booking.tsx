@@ -1,596 +1,194 @@
-import { useState, useEffect } from "react";
+import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Calendar,
-  Users,
+  AlertCircle,
+  CalendarDays,
+  CheckCircle2,
   CreditCard,
-  Check,
-  ArrowLeft,
-  ArrowRight,
-  MapPin,
-  Star,
-  Wifi,
-  Coffee,
-  Car,
-  Utensils,
-  Shield,
-  Crown,
+  ImageUp,
+  Landmark,
+  LockKeyhole,
+  Mail,
+  Phone,
+  ReceiptText,
+  UserRound,
+  Users,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
-interface BookingStep {
-  id: number;
-  title: string;
-  description: string;
-}
+type PaymentProofFormState = {
+  fullName: string;
+  email: string;
+  phone: string;
+  roomName: string;
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  paymentMethod: string;
+  transactionReference: string;
+  message: string;
+};
 
-const steps: BookingStep[] = [
-  {
-    id: 1,
-    title: "Select Dates",
-    description: "Choose your check-in and check-out dates",
-  },
-  {
-    id: 2,
-    title: "Choose Room",
-    description: "Select your preferred accommodation",
-  },
-  {
-    id: 3,
-    title: "Add Services",
-    description: "Enhance your stay with premium add-ons",
-  },
-  {
-    id: 4,
-    title: "Guest Details",
-    description: "Provide your contact information",
-  },
-  {
-    id: 5,
-    title: "Payment",
-    description: "Secure payment and confirmation",
-  },
-];
+type ApiResponse = {
+  success: boolean;
+  message?: string;
+  error?: string;
+};
 
-const mockRooms = [
-  {
-    id: "1",
-    name: "Deluxe Ocean View",
-    price: 399,
-    originalPrice: 499,
-    image:
-      "C:\Users\naina\Desktop\website2\pic 1 (1).png ",
-    features: ["Ocean View", "King Be", "42m²", "Private Balcony"],
-    amenities: ["Wi-Fi", "Mini Bar", "Room Service", "Concierge"],
-    capacity: "2 Adults, 1 Child",
-  },
-  {
-    id: "2",
-    name: "Executive Suite",
-    price: 699,
-    originalPrice: 849,
-    image:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=500&auto=format&fit=crop",
-    features: ["City View", "Living Area", "65m²", "Work Desk"],
-    amenities: ["Wi-Fi", "Kitchenette", "24/7 Service", "Business Center"],
-    capacity: "3 Adults, 2 Children",
-  },
-  {
-    id: "3",
-    name: "Presidential Suite",
-    price: 1299,
-    originalPrice: 1599,
-    image:
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=500&auto=format&fit=crop",
-    features: ["Panoramic View", "Private Terrace", "120m²", "Dining Area"],
-    amenities: ["Butler Service", "Private Chef", "Spa Access", "Limousine"],
-    capacity: "4 Adults, 2 Children",
-  },
-];
+const initialFormState: PaymentProofFormState = {
+  fullName: "",
+  email: "",
+  phone: "",
+  roomName: "",
+  checkIn: "",
+  checkOut: "",
+  guests: "2",
+  paymentMethod: "",
+  transactionReference: "",
+  message: "",
+};
 
-const addOns = [
-  {
-    id: "1",
-    name: "Gourmet Breakfast",
-    description: "Daily continental breakfast for two",
-    price: 45,
-    icon: Coffee,
-  },
-  {
-    id: "2",
-    name: "Spa Package",
-    description: "Couples massage and spa access",
-    price: 250,
-    icon: Crown,
-  },
-  {
-    id: "3",
-    name: "Airport Transfer",
-    description: "Luxury car service to/from airport",
-    price: 85,
-    icon: Car,
-  },
-  {
-    id: "4",
-    name: "Fine Dining",
-    description: "3-course dinner at our Michelin-starred restaurant",
-    price: 180,
-    icon: Utensils,
-  },
+const acceptedMimeTypes = ["image/jpeg", "image/png", "image/webp"];
+const maxFileSize = 5 * 1024 * 1024;
+
+const paymentMethodOptions = [
+  "Bank transfer",
+  "Telebirr",
+  "CBE Birr",
+  "Mobile money",
+  "Cash deposit",
 ];
 
 export default function Booking() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [bookingData, setBookingData] = useState({
-    checkIn: "",
-    checkOut: "",
-    adults: 2,
-    children: 0,
-    selectedRoom: "",
-    selectedAddOns: [] as string[],
-    guestInfo: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      specialRequests: "",
-    },
-  });
+  const [form, setForm] = useState<PaymentProofFormState>(initialFormState);
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [submitError, setSubmitError] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileInputKey, setFileInputKey] = useState(0);
 
-  const nextStep = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1);
+  const staySummary = useMemo(() => {
+    if (!form.checkIn || !form.checkOut) {
+      return null;
     }
-  };
 
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+    const checkInDate = new Date(form.checkIn);
+    const checkOutDate = new Date(form.checkOut);
+    const nights = Math.ceil(
+      (checkOutDate.getTime() - checkInDate.getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
+
+    if (Number.isNaN(nights) || nights <= 0) {
+      return null;
     }
-  };
 
-  const handleAddOnToggle = (addOnId: string) => {
-    setBookingData((prev) => ({
-      ...prev,
-      selectedAddOns: prev.selectedAddOns.includes(addOnId)
-        ? prev.selectedAddOns.filter((id) => id !== addOnId)
-        : [...prev.selectedAddOns, addOnId],
-    }));
-  };
+    return `${nights} night${nights > 1 ? "s" : ""}`;
+  }, [form.checkIn, form.checkOut]);
 
-  const calculateNights = () => {
-    if (!bookingData.checkIn || !bookingData.checkOut) return 0;
-    const checkIn = new Date(bookingData.checkIn);
-    const checkOut = new Date(bookingData.checkOut);
-    return Math.ceil(
-      (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24),
-    );
-  };
-
-  const calculateTotal = () => {
-    const selectedRoom = mockRooms.find(
-      (r) => r.id === bookingData.selectedRoom,
-    );
-    const roomPrice = selectedRoom ? selectedRoom.price : 0;
-    const nights = calculateNights();
-    const roomTotal = roomPrice * nights;
-
-    const addOnsTotal = addOns
-      .filter((addon) => bookingData.selectedAddOns.includes(addon.id))
-      .reduce((sum, addon) => sum + addon.price, 0);
-
-    return {
-      roomTotal,
-      addOnsTotal,
-      nights,
-      total: roomTotal + addOnsTotal,
+  const handleInputChange =
+    (field: keyof PaymentProofFormState) =>
+    (
+      event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    ) => {
+      setForm((current) => ({
+        ...current,
+        [field]: event.target.value,
+      }));
     };
+
+  const validateScreenshot = (file: File | null) => {
+    if (!file) {
+      return "Payment screenshot is required.";
+    }
+
+    if (!acceptedMimeTypes.includes(file.type)) {
+      return "Upload a JPG, PNG, or WebP screenshot.";
+    }
+
+    if (file.size > maxFileSize) {
+      return "Screenshot must be 5MB or smaller.";
+    }
+
+    return "";
   };
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="checkin">Check-in Date</Label>
-                <div className="relative">
-                  <Input
-                    id="checkin"
-                    type="date"
-                    value={bookingData.checkIn}
-                    onChange={(e) =>
-                      setBookingData((prev) => ({
-                        ...prev,
-                        checkIn: e.target.value,
-                      }))
-                    }
-                    className="pl-10"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="checkout">Check-out Date</Label>
-                <div className="relative">
-                  <Input
-                    id="checkout"
-                    type="date"
-                    value={bookingData.checkOut}
-                    onChange={(e) =>
-                      setBookingData((prev) => ({
-                        ...prev,
-                        checkOut: e.target.value,
-                      }))
-                    }
-                    className="pl-10"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="adults">Adults</Label>
-                <Select
-                  value={bookingData.adults.toString()}
-                  onValueChange={(value) =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      adults: parseInt(value),
-                    }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[1, 2, 3, 4, 5, 6].map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} Adult{num > 1 ? "s" : ""}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="children">Children</Label>
-                <Select
-                  value={bookingData.children.toString()}
-                  onValueChange={(value) =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      children: parseInt(value),
-                    }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[0, 1, 2, 3, 4].map((num) => (
-                      <SelectItem key={num} value={num.toString()}>
-                        {num} Child{num > 1 ? "ren" : num === 1 ? "" : "ren"}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            {calculateNights() > 0 && (
-              <div className="bg-luxury-50 rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-luxury-700 font-medium">
-                    Your Stay Duration
-                  </span>
-                  <span className="text-luxury-800 font-bold">
-                    {calculateNights()} night{calculateNights() > 1 ? "s" : ""}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        );
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    const fileError = validateScreenshot(file);
 
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              {mockRooms.map((room) => (
-                <Card
-                  key={room.id}
-                  className={cn(
-                    "cursor-pointer transition-all duration-200 hover:shadow-lg",
-                    bookingData.selectedRoom === room.id
-                      ? "ring-2 ring-luxury-500 shadow-lg"
-                      : "",
-                  )}
-                  onClick={() =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      selectedRoom: room.id,
-                    }))
-                  }
-                >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col md:flex-row gap-6">
-                      <div className="w-full md:w-48 h-32 md:h-auto">
-                        <img
-                          src={room.image}
-                          alt={room.name}
-                          className="w-full h-full object-cover rounded-lg"
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="text-xl font-bold text-hotel-900">
-                            {room.name}
-                          </h3>
-                          <div className="text-right">
-                            <div className="text-sm text-muted-foreground line-through">
-                              ${room.originalPrice}/night
-                            </div>
-                            <div className="text-2xl font-bold text-luxury-600">
-                              ${room.price}/night
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-hotel-600 mb-3">
-                          Capacity: {room.capacity}
-                        </p>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {room.features.map((feature, idx) => (
-                            <Badge
-                              key={idx}
-                              variant="secondary"
-                              className="text-xs"
-                            >
-                              {feature}
-                            </Badge>
-                          ))}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {room.amenities.map((amenity, idx) => (
-                            <span
-                              key={idx}
-                              className="text-xs text-hotel-500 bg-hotel-50 px-2 py-1 rounded"
-                            >
-                              {amenity}
-                            </span>
-                          ))}
-                        </div>
-                        {calculateNights() > 0 && (
-                          <div className="mt-4 p-3 bg-luxury-50 rounded-lg">
-                            <div className="flex justify-between items-center">
-                              <span className="text-luxury-700">
-                                Total for {calculateNights()} night
-                                {calculateNights() > 1 ? "s" : ""}:
-                              </span>
-                              <span className="text-xl font-bold text-luxury-800">
-                                ${room.price * calculateNights()}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
+    setSubmitSuccess("");
 
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {addOns.map((addon) => (
-                <Card
-                  key={addon.id}
-                  className={cn(
-                    "cursor-pointer transition-all duration-200 hover:shadow-md",
-                    bookingData.selectedAddOns.includes(addon.id)
-                      ? "ring-2 ring-luxury-500 shadow-md"
-                      : "",
-                  )}
-                  onClick={() => handleAddOnToggle(addon.id)}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 luxury-gradient rounded-lg flex items-center justify-center flex-shrink-0">
-                        <addon.icon className="w-6 h-6 text-hotel-900" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-bold text-hotel-900">
-                            {addon.name}
-                          </h3>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-lg font-bold text-luxury-600">
-                              ${addon.price}
-                            </span>
-                            <Checkbox
-                              checked={bookingData.selectedAddOns.includes(
-                                addon.id,
-                              )}
-                              onChange={() => handleAddOnToggle(addon.id)}
-                            />
-                          </div>
-                        </div>
-                        <p className="text-hotel-600 text-sm">
-                          {addon.description}
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        );
+    if (fileError) {
+      setScreenshot(null);
+      setSubmitError(fileError);
+      return;
+    }
 
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name *</Label>
-                <Input
-                  id="firstName"
-                  value={bookingData.guestInfo.firstName}
-                  onChange={(e) =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      guestInfo: {
-                        ...prev.guestInfo,
-                        firstName: e.target.value,
-                      },
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name *</Label>
-                <Input
-                  id="lastName"
-                  value={bookingData.guestInfo.lastName}
-                  onChange={(e) =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      guestInfo: {
-                        ...prev.guestInfo,
-                        lastName: e.target.value,
-                      },
-                    }))
-                  }
-                  required
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={bookingData.guestInfo.email}
-                  onChange={(e) =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      guestInfo: {
-                        ...prev.guestInfo,
-                        email: e.target.value,
-                      },
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={bookingData.guestInfo.phone}
-                  onChange={(e) =>
-                    setBookingData((prev) => ({
-                      ...prev,
-                      guestInfo: {
-                        ...prev.guestInfo,
-                        phone: e.target.value,
-                      },
-                    }))
-                  }
-                  required
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="specialRequests">Special Requests</Label>
-              <Textarea
-                id="specialRequests"
-                placeholder="Any special requests or preferences..."
-                value={bookingData.guestInfo.specialRequests}
-                onChange={(e) =>
-                  setBookingData((prev) => ({
-                    ...prev,
-                    guestInfo: {
-                      ...prev.guestInfo,
-                      specialRequests: e.target.value,
-                    },
-                  }))
-                }
-                rows={4}
-              />
-            </div>
-          </div>
-        );
+    setSubmitError("");
+    setScreenshot(file);
+  };
 
-      case 5:
-        const total = calculateTotal();
-        return (
-          <div className="space-y-6">
-            <Card className="border-luxury-200">
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Shield className="w-5 h-5 text-luxury-600" />
-                  <span>Secure Payment</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-center p-8 bg-luxury-50 rounded-lg">
-                  <CreditCard className="w-16 h-16 text-luxury-600 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-hotel-900 mb-2">
-                    Payment Integration
-                  </h3>
-                  <p className="text-hotel-600 mb-4">
-                    In a production environment, this would integrate with
-                    Stripe or another payment processor.
-                  </p>
-                  <div className="bg-white rounded-lg p-4 border border-luxury-200">
-                    <div className="text-left space-y-2">
-                      <div className="flex justify-between">
-                        <span>Room Total:</span>
-                        <span>${total.roomTotal}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Add-ons:</span>
-                        <span>${total.addOnsTotal}</span>
-                      </div>
-                      <hr className="border-luxury-200" />
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Total:</span>
-                        <span>${total.total}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-      default:
-        return null;
+    const fileError = validateScreenshot(screenshot);
+    if (fileError) {
+      setSubmitSuccess("");
+      setSubmitError(fileError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError("");
+    setSubmitSuccess("");
+
+    const payload = new FormData();
+    payload.append("fullName", form.fullName);
+    payload.append("email", form.email);
+    payload.append("phone", form.phone);
+    payload.append("roomName", form.roomName);
+    payload.append("checkIn", form.checkIn);
+    payload.append("checkOut", form.checkOut);
+    payload.append("guests", form.guests);
+    payload.append("paymentMethod", form.paymentMethod);
+    payload.append("transactionReference", form.transactionReference);
+    payload.append("message", form.message);
+    payload.append("screenshot", screenshot as File);
+
+    try {
+      const response = await fetch("/api/payment-proof", {
+        method: "POST",
+        body: payload,
+      });
+
+      const data = (await response.json()) as ApiResponse;
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Unable to submit payment proof.");
+      }
+
+      setSubmitSuccess(
+        data.message || "Payment proof submitted successfully.",
+      );
+      setForm(initialFormState);
+      setScreenshot(null);
+      setFileInputKey((current) => current + 1);
+    } catch (error) {
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Unable to submit payment proof.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -598,114 +196,372 @@ export default function Booking() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="pt-20">
-        {/* Hero Section */}
-        <section className="py-16 bg-gradient-to-r from-hotel-900 to-hotel-800 text-white">
+      <main className="overflow-x-hidden">
+        <section className="relative isolate pt-32 pb-20">
+          <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.22),transparent_38%),linear-gradient(135deg,#111827_0%,#1f2937_45%,#f8f3ea_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-background" />
+
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                Book Your Luxury Escape
-              </h1>
-              <p className="text-xl opacity-90">
-                Create unforgettable memories at Golden Oasis Hotel
-              </p>
+            <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+              <div className="text-white">
+                <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-1 text-sm font-semibold tracking-[0.24em] text-luxury-200 uppercase">
+                  Manual payment confirmation
+                </span>
+                <h1 className="mt-6 max-w-3xl text-4xl font-bold leading-tight text-balance md:text-6xl">
+                  Send your hotel payment proof directly to our reservations
+                  team.
+                </h1>
+                <p className="mt-6 max-w-2xl text-lg text-white/78 md:text-xl">
+                  Complete the booking details, upload your payment screenshot,
+                  and we will review it and confirm your stay by email.
+                </p>
+
+                <div className="mt-10 grid gap-4 sm:grid-cols-3">
+                  <Card className="border-white/10 bg-white/10 text-white shadow-none backdrop-blur-md">
+                    <CardContent className="flex items-start gap-3 p-5">
+                      <LockKeyhole className="mt-0.5 h-5 w-5 text-luxury-300" />
+                      <div>
+                        <p className="font-semibold">Private handling</p>
+                        <p className="mt-1 text-sm text-white/70">
+                          Your proof is sent to the hotel inbox only.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-white/10 bg-white/10 text-white shadow-none backdrop-blur-md">
+                    <CardContent className="flex items-start gap-3 p-5">
+                      <ReceiptText className="mt-0.5 h-5 w-5 text-luxury-300" />
+                      <div>
+                        <p className="font-semibold">Fast verification</p>
+                        <p className="mt-1 text-sm text-white/70">
+                          Include the exact transaction reference for review.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="border-white/10 bg-white/10 text-white shadow-none backdrop-blur-md">
+                    <CardContent className="flex items-start gap-3 p-5">
+                      <ImageUp className="mt-0.5 h-5 w-5 text-luxury-300" />
+                      <div>
+                        <p className="font-semibold">Image proof</p>
+                        <p className="mt-1 text-sm text-white/70">
+                          Accepted formats: JPG, PNG, or WebP up to 5MB.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+
+              <Card className="border border-luxury-200/60 bg-white/95 shadow-2xl backdrop-blur">
+                <CardHeader className="space-y-3 pb-3">
+                  <CardTitle className="text-2xl text-hotel-900 md:text-3xl">
+                    Payment proof form
+                  </CardTitle>
+                  <p className="text-sm leading-6 text-hotel-600">
+                    Fill in the guest details exactly as they appear on the
+                    transfer. Fields marked with * are required.
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <form className="space-y-6" onSubmit={handleSubmit}>
+                    {submitError ? (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Submission failed</AlertTitle>
+                        <AlertDescription>{submitError}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    {submitSuccess ? (
+                      <Alert className="border-luxury-300 bg-luxury-50 text-hotel-900">
+                        <CheckCircle2 className="h-4 w-4 text-luxury-700" />
+                        <AlertTitle>Payment proof received</AlertTitle>
+                        <AlertDescription>{submitSuccess}</AlertDescription>
+                      </Alert>
+                    ) : null}
+
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full name *</Label>
+                        <div className="relative">
+                          <UserRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="fullName"
+                            name="fullName"
+                            value={form.fullName}
+                            onChange={handleInputChange("fullName")}
+                            className="h-11 border-hotel-200 pl-10"
+                            autoComplete="name"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email *</Label>
+                        <div className="relative">
+                          <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={form.email}
+                            onChange={handleInputChange("email")}
+                            className="h-11 border-hotel-200 pl-10"
+                            autoComplete="email"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone *</Label>
+                        <div className="relative">
+                          <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="phone"
+                            name="phone"
+                            type="tel"
+                            value={form.phone}
+                            onChange={handleInputChange("phone")}
+                            className="h-11 border-hotel-200 pl-10"
+                            autoComplete="tel"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="guests">Guests</Label>
+                        <div className="relative">
+                          <Users className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="guests"
+                            name="guests"
+                            type="number"
+                            min="1"
+                            value={form.guests}
+                            onChange={handleInputChange("guests")}
+                            className="h-11 border-hotel-200 pl-10"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="roomName">Room / booking details</Label>
+                      <Input
+                        id="roomName"
+                        name="roomName"
+                        value={form.roomName}
+                        onChange={handleInputChange("roomName")}
+                        className="h-11 border-hotel-200"
+                        placeholder="Example: Deluxe Ocean View, honeymoon booking"
+                      />
+                    </div>
+
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="checkIn">Check-in date</Label>
+                        <div className="relative">
+                          <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="checkIn"
+                            name="checkIn"
+                            type="date"
+                            value={form.checkIn}
+                            onChange={handleInputChange("checkIn")}
+                            className="h-11 border-hotel-200 pl-10"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="checkOut">Check-out date</Label>
+                        <div className="relative">
+                          <CalendarDays className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="checkOut"
+                            name="checkOut"
+                            type="date"
+                            value={form.checkOut}
+                            onChange={handleInputChange("checkOut")}
+                            className="h-11 border-hotel-200 pl-10"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {staySummary ? (
+                      <div className="rounded-2xl border border-luxury-200 bg-luxury-50/80 px-4 py-3 text-sm text-hotel-700">
+                        Planned stay: <span className="font-semibold">{staySummary}</span>
+                      </div>
+                    ) : null}
+
+                    <div className="grid gap-5 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="paymentMethod">Payment method *</Label>
+                        <div className="relative">
+                          <CreditCard className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <select
+                            id="paymentMethod"
+                            name="paymentMethod"
+                            value={form.paymentMethod}
+                            onChange={handleInputChange("paymentMethod")}
+                            className="flex h-11 w-full appearance-none rounded-md border border-hotel-200 bg-background pl-10 pr-4 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            required
+                          >
+                            <option value="">Select a payment method</option>
+                            {paymentMethodOptions.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="transactionReference">
+                          Transaction/reference number *
+                        </Label>
+                        <div className="relative">
+                          <Landmark className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-hotel-400" />
+                          <Input
+                            id="transactionReference"
+                            name="transactionReference"
+                            value={form.transactionReference}
+                            onChange={handleInputChange("transactionReference")}
+                            className="h-11 border-hotel-200 pl-10"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="screenshot">Payment screenshot *</Label>
+                      <div className="rounded-2xl border border-dashed border-luxury-300 bg-luxury-50/40 p-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="font-semibold text-hotel-900">
+                              Upload a clear screenshot of the payment proof
+                            </p>
+                            <p className="mt-1 text-sm text-hotel-600">
+                              JPG, PNG, or WebP. Maximum size 5MB.
+                            </p>
+                          </div>
+                          <ImageUp className="h-10 w-10 text-luxury-600" />
+                        </div>
+
+                        <Input
+                          key={fileInputKey}
+                          id="screenshot"
+                          name="screenshot"
+                          type="file"
+                          accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                          onChange={handleFileChange}
+                          className="mt-4 border-white bg-white file:mr-4 file:rounded-md file:border-0 file:bg-hotel-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-hotel-800"
+                          required
+                        />
+
+                        <p className="mt-3 text-sm text-hotel-700">
+                          {screenshot
+                            ? `Selected file: ${screenshot.name}`
+                            : "No file selected yet."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="message">
+                        Message / special request
+                      </Label>
+                      <Textarea
+                        id="message"
+                        name="message"
+                        value={form.message}
+                        onChange={handleInputChange("message")}
+                        className="min-h-32 border-hotel-200"
+                        placeholder="Add any notes for the reservation team."
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-4 rounded-2xl bg-hotel-900 px-5 py-5 text-white sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold">Ready for review</p>
+                        <p className="mt-1 text-sm text-white/70">
+                          The hotel will receive your payment proof by email
+                          with the uploaded screenshot attached.
+                        </p>
+                      </div>
+                      <Button
+                        type="submit"
+                        size="lg"
+                        disabled={isSubmitting}
+                        className="min-w-52 bg-luxury-500 text-hotel-900 hover:bg-luxury-400"
+                      >
+                        {isSubmitting ? "Submitting..." : "Submit payment proof"}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* Booking Form */}
-        <section className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Progress Steps */}
-            <div className="mb-12">
-              <div className="flex items-center justify-center space-x-4 overflow-x-auto">
-                {steps.map((step, index) => (
-                  <div key={step.id} className="flex items-center">
-                    <div className="flex flex-col items-center min-w-0">
-                      <div
-                        className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-colors",
-                          currentStep >= step.id
-                            ? "luxury-gradient text-hotel-900"
-                            : "bg-hotel-100 text-hotel-400",
-                        )}
-                      >
-                        {currentStep > step.id ? (
-                          <Check className="w-5 h-5" />
-                        ) : (
-                          step.id
-                        )}
-                      </div>
-                      <div className="mt-2 text-center">
-                        <div
-                          className={cn(
-                            "text-sm font-medium",
-                            currentStep >= step.id
-                              ? "text-luxury-600"
-                              : "text-hotel-400",
-                          )}
-                        >
-                          {step.title}
-                        </div>
-                        <div className="text-xs text-hotel-500 hidden md:block">
-                          {step.description}
-                        </div>
-                      </div>
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div
-                        className={cn(
-                          "w-16 h-0.5 mx-4 transition-colors",
-                          currentStep > step.id
-                            ? "bg-luxury-400"
-                            : "bg-hotel-200",
-                        )}
-                      />
-                    )}
+        <section className="pb-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+              <Card className="card-luxury border-luxury-200/70">
+                <CardHeader>
+                  <CardTitle className="text-hotel-900">
+                    Before you submit
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm leading-6 text-hotel-700">
+                  <p>
+                    Use the same email and phone number you want the hotel to
+                    use when confirming your reservation.
+                  </p>
+                  <p>
+                    Make sure the screenshot clearly shows the amount, the date,
+                    and the transaction/reference number.
+                  </p>
+                  <p>
+                    If you have not selected a room yet, you can browse current
+                    options before sending the payment proof.
+                  </p>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="mt-2 border-luxury-300 text-luxury-700 hover:bg-luxury-50"
+                  >
+                    <Link to="/rooms">Browse rooms and suites</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="overflow-hidden border-hotel-200">
+                <div className="relative h-full min-h-72 bg-[linear-gradient(160deg,rgba(17,24,39,0.96),rgba(55,65,81,0.9)),url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400&auto=format&fit=crop')] bg-cover bg-center">
+                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="relative flex h-full flex-col justify-end p-8 text-white">
+                    <p className="text-sm uppercase tracking-[0.3em] text-luxury-300">
+                      Golden Oasis reservations
+                    </p>
+                    <h2 className="mt-3 max-w-xl text-3xl font-bold">
+                      A polished arrival starts with a clear confirmation.
+                    </h2>
+                    <p className="mt-3 max-w-xl text-sm leading-6 text-white/78">
+                      Once your proof is reviewed, the reservations team can
+                      follow up with room confirmation and next steps for your
+                      stay.
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Step Content */}
-            <Card className="shadow-xl">
-              <CardHeader>
-                <CardTitle className="text-2xl text-hotel-900">
-                  {steps[currentStep - 1].title}
-                </CardTitle>
-                <p className="text-hotel-600">
-                  {steps[currentStep - 1].description}
-                </p>
-              </CardHeader>
-              <CardContent>{renderStepContent()}</CardContent>
-            </Card>
-
-            {/* Navigation */}
-            <div className="flex justify-between mt-8">
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                disabled={currentStep === 1}
-                className="flex items-center space-x-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </Button>
-
-              {currentStep < steps.length ? (
-                <Button
-                  onClick={nextStep}
-                  className="luxury-gradient text-hotel-900 hover:opacity-90 flex items-center space-x-2"
-                >
-                  <span>Next</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              ) : (
-                <Button className="luxury-gradient text-hotel-900 hover:opacity-90 flex items-center space-x-2">
-                  <span>Complete Booking</span>
-                  <Check className="w-4 h-4" />
-                </Button>
-              )}
+                </div>
+              </Card>
             </div>
           </div>
         </section>

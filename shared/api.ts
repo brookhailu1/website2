@@ -144,6 +144,25 @@ export interface PaymentRequest {
   paymentMethodId: string;
 }
 
+export interface PaymentProofSubmission {
+  fullName: string;
+  email: string;
+  phone: string;
+  roomName?: string;
+  checkIn?: string;
+  checkOut?: string;
+  guests?: string;
+  paymentMethod: string;
+  transactionReference: string;
+  message?: string;
+}
+
+export interface PaymentProofResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
 // Blog & Content
 export interface BlogPost {
   id: string;
