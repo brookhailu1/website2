@@ -1,0 +1,418 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Tailwind CSS theme
+   * tailwind.config.ts expects the following color variables to be expressed as HSL values.
+   * A different format will require also updating the theme in tailwind.config.ts.
+  */
+  :root {
+    --background: 39 100% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 215 83% 20%;
+    --primary-foreground: 39 100% 98%;
+
+    --secondary: 39 100% 96%;
+    --secondary-foreground: 215 83% 20%;
+
+    --muted: 39 50% 95%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 45 100% 85%;
+    --accent-foreground: 215 83% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 39 30% 88%;
+    --input: 39 30% 88%;
+    --ring: 215 83% 20%;
+
+    --radius: 0.75rem;
+
+    /* Golden Oasis Hotel brand colors - Elegant charcoal */
+    --hotel-50: 210 20% 98%;
+    --hotel-100: 210 20% 95%;
+    --hotel-200: 210 20% 90%;
+    --hotel-300: 210 20% 82%;
+    --hotel-400: 210 20% 65%;
+    --hotel-500: 210 20% 45%;
+    --hotel-600: 210 25% 30%;
+    --hotel-700: 210 25% 25%;
+    --hotel-800: 210 30% 18%;
+    --hotel-900: 210 30% 12%;
+    --hotel-950: 210 35% 8%;
+
+    /* Golden Oasis luxury gold colors */
+    --luxury-50: 42 100% 97%;
+    --luxury-100: 42 100% 93%;
+    --luxury-200: 43 96% 85%;
+    --luxury-300: 43 94% 76%;
+    --luxury-400: 42 93% 68%;
+    --luxury-500: 41 89% 60%;
+    --luxury-600: 38 85% 53%;
+    --luxury-700: 35 79% 46%;
+    --luxury-800: 32 74% 38%;
+    --luxury-900: 28 69% 32%;
+    --luxury-950: 25 60% 20%;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 224 64% 6%;
+    --foreground: 39 100% 98%;
+
+    --card: 224 64% 8%;
+    --card-foreground: 39 100% 98%;
+
+    --popover: 224 64% 8%;
+    --popover-foreground: 39 100% 98%;
+
+    --primary: 45 100% 85%;
+    --primary-foreground: 224 64% 6%;
+
+    --secondary: 224 50% 15%;
+    --secondary-foreground: 39 100% 98%;
+
+    --muted: 224 50% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 224 50% 20%;
+    --accent-foreground: 45 100% 85%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 224 50% 15%;
+    --input: 224 50% 15%;
+    --ring: 45 100% 85%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .luxury-gradient {
+    background: linear-gradient(
+      135deg,
+      #f4ba3e 0%,
+      #e6a823 25%,
+      #d4af37 50%,
+      #c9a332 75%,
+      #b8942a 100%
+    );
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.3);
+  }
+
+  .luxury-gradient-hover {
+    background: linear-gradient(
+      135deg,
+      #f7c955 0%,
+      #e8b332 25%,
+      #d6b142 50%,
+      #cba535 75%,
+      #ba962e 100%
+    );
+    box-shadow: 0 12px 40px rgba(212, 175, 55, 0.4);
+  }
+
+  .hotel-gradient {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 50%, #171923 100%);
+    box-shadow: 0 8px 32px rgba(45, 55, 72, 0.3);
+  }
+
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .luxury-shadow {
+    box-shadow:
+      0 4px 16px rgba(212, 175, 55, 0.15),
+      0 8px 32px rgba(212, 175, 55, 0.1),
+      0 16px 64px rgba(212, 175, 55, 0.05);
+  }
+
+  .hotel-shadow {
+    box-shadow:
+      0 4px 16px rgba(30, 30, 30, 0.15),
+      0 8px 32px rgba(30, 30, 30, 0.1),
+      0 16px 64px rgba(30, 30, 30, 0.05);
+  }
+
+  .card-luxury {
+    background: linear-gradient(145deg, #ffffff 0%, #fefcf6 100%);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    box-shadow:
+      0 2px 8px rgba(212, 175, 55, 0.08),
+      0 8px 24px rgba(212, 175, 55, 0.06),
+      0 16px 48px rgba(212, 175, 55, 0.04);
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(212, 175, 55, 0.1),
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+  }
+
+  .floating {
+    animation: floating 6s ease-in-out infinite;
+  }
+
+  .pulse-luxury {
+    animation: pulseLuxury 2s infinite;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  .slide-up {
+    animation: slideUp 1s ease-out;
+  }
+
+  .slide-in-left {
+    animation: slideInLeft 0.8s ease-out;
+  }
+
+  .slide-in-right {
+    animation: slideInRight 0.8s ease-out;
+  }
+
+  .scale-in {
+    animation: scaleIn 0.6s ease-out;
+  }
+
+  .luxury-text-shadow {
+    text-shadow: 0 2px 4px rgba(212, 175, 55, 0.1);
+  }
+
+  .parallax-bg {
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  @keyframes floating {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes pulseLuxury {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+    }
+    50% {
+      transform: scale(1.02);
+      box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(40px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Luxury scroll behavior */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+  }
+
+  /* Interactive elements */
+  .hover-lift {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.1),
+      0 4px 16px rgba(212, 175, 55, 0.2);
+  }
+
+  /* Luxury button styles */
+  .btn-luxury {
+    background: linear-gradient(135deg, #f4ba3e 0%, #d4af37 100%);
+    border: none;
+    color: #1a202c;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .btn-luxury::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  .btn-luxury:hover::before {
+    left: 100%;
+  }
+
+  .btn-luxury:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Enhanced focus states */
+  .focus-luxury:focus {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgba(212, 175, 55, 0.2),
+      0 0 0 1px rgba(212, 175, 55, 0.4);
+  }
+}
