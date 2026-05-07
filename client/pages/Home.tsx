@@ -178,7 +178,7 @@ export default function Home() {
       <Hero />
 
       {/* Welcome Section */}
-      <section className="py-24 mt-20 relative overflow-hidden">
+      <section className="relative overflow-hidden py-24">
         {/* Background decoration */}
         <div className="absolute top-0 left-0 w-64 h-64 luxury-gradient rounded-full opacity-5 -translate-x-32 -translate-y-32"></div>
         <div className="absolute bottom-0 right-0 w-96 h-96 hotel-gradient rounded-full opacity-5 translate-x-48 translate-y-48"></div>

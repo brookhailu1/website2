@@ -257,6 +257,10 @@
     background-size: cover;
   }
 
+  .hero-zoom-slow {
+    transition-duration: 30000ms;
+  }
+
   @keyframes shimmer {
     0% {
       background-position: -200% 0;

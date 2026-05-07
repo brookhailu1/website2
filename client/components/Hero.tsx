@@ -26,12 +26,12 @@ export default function Hero() {
   const [guests, setGuests] = useState("2");
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden pb-16 pt-28 md:pb-20">
       {/* Parallax Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-r from-hotel-900/90 via-hotel-800/70 to-hotel-900/90 z-10"></div>
         <div
-          className="absolute inset-0 parallax-bg scale-110 transition-transform duration-[30s] ease-linear hover:scale-105"
+          className="absolute inset-0 parallax-bg scale-110 hero-zoom-slow ease-linear hover:scale-105"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')`,
           }}
@@ -49,7 +49,7 @@ export default function Hero() {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 text-center text-white max-w-6xl mx-auto px-4 pt-20">
+      <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col px-4 pt-12 text-center text-white">
         {/* Luxury Badge */}
         <div className="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-8 border border-white/30 scale-in">
           <Sparkles className="w-5 h-5 text-luxury-400 pulse-luxury" />
@@ -79,7 +79,7 @@ export default function Hero() {
         </div>
 
         {/* Enhanced CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16 scale-in">
+        <div className="mb-10 flex flex-col justify-center gap-6 scale-in sm:flex-row md:mb-12">
           <Button
             asChild
             size="lg"
@@ -102,33 +102,33 @@ export default function Hero() {
           </Button>
         </div>
 
-        {/* Enhanced Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <div className="flex flex-col items-center space-y-2 floating">
-            <span className="text-xs font-medium text-white/70 tracking-wider">
-              SCROLL DOWN
-            </span>
-            <ChevronDown className="w-6 h-6 text-white/70 pulse-luxury" />
-          </div>
-        </div>
-      </div>
-
-      {/* Luxury Booking Card */}
-      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-full max-w-6xl px-4 z-30 slide-up">
-        <Card className="card-luxury backdrop-blur-lg border-0 shadow-2xl luxury-shadow hover-lift rounded-2xl overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 luxury-gradient"></div>
-          <CardContent className="p-8 md:p-10">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-hotel-900 mb-3 luxury-text-shadow">
-                Check Availability
-              </h3>
-              <p className="text-hotel-600 text-lg">
-                Find the perfect room for your luxury getaway
-              </p>
+        <Card className="mx-auto w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/15 bg-white/92 text-left shadow-2xl backdrop-blur-xl slide-up">
+          <div className="absolute inset-x-0 top-0 h-1 luxury-gradient" />
+          <CardContent className="p-5 sm:p-6 lg:p-7">
+            <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-luxury-700">
+                  Check Availability
+                </p>
+                <h3 className="mt-2 text-2xl font-bold text-hotel-900 luxury-text-shadow">
+                  Plan your stay in one quick step
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs font-medium text-hotel-600">
+                <span className="rounded-full bg-luxury-50 px-3 py-1.5">
+                  Best Rate Guaranteed
+                </span>
+                <span className="rounded-full bg-luxury-50 px-3 py-1.5">
+                  Free Cancellation
+                </span>
+                <span className="rounded-full bg-luxury-50 px-3 py-1.5">
+                  Instant Request
+                </span>
+              </div>
             </div>
 
-            <form className="grid grid-cols-1 md:grid-cols-4 gap-6 md:gap-8">
-              <div className="space-y-3">
+            <form className="grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1.1fr_0.85fr_auto] lg:items-end">
+              <div className="space-y-2">
                 <Label
                   htmlFor="checkin"
                   className="text-sm font-semibold text-hotel-700 tracking-wide"
@@ -141,13 +141,13 @@ export default function Hero() {
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
-                    className="pl-12 pr-4 py-3 border-2 border-hotel-200 focus:ring-luxury-500 focus:border-luxury-500 rounded-xl transition-all duration-300 hover:border-luxury-300 focus-luxury"
+                    className="h-12 rounded-2xl border border-hotel-200 bg-white pl-11 pr-4 text-hotel-900 shadow-sm transition-all duration-300 hover:border-luxury-300 focus:border-luxury-500 focus:ring-luxury-500"
                   />
-                  <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-luxury-500 group-hover:text-luxury-600 transition-colors" />
+                  <Calendar className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-luxury-500 transition-colors group-hover:text-luxury-600" />
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label
                   htmlFor="checkout"
                   className="text-sm font-semibold text-hotel-700 tracking-wide"
@@ -160,13 +160,13 @@ export default function Hero() {
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
-                    className="pl-12 pr-4 py-3 border-2 border-hotel-200 focus:ring-luxury-500 focus:border-luxury-500 rounded-xl transition-all duration-300 hover:border-luxury-300 focus-luxury"
+                    className="h-12 rounded-2xl border border-hotel-200 bg-white pl-11 pr-4 text-hotel-900 shadow-sm transition-all duration-300 hover:border-luxury-300 focus:border-luxury-500 focus:ring-luxury-500"
                   />
-                  <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-luxury-500 group-hover:text-luxury-600 transition-colors" />
+                  <Calendar className="absolute left-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-luxury-500 transition-colors group-hover:text-luxury-600" />
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <Label
                   htmlFor="guests"
                   className="text-sm font-semibold text-hotel-700 tracking-wide"
@@ -174,9 +174,9 @@ export default function Hero() {
                   Guests
                 </Label>
                 <Select value={guests} onValueChange={setGuests}>
-                  <SelectTrigger className="border-2 border-hotel-200 focus:ring-luxury-500 focus:border-luxury-500 rounded-xl py-3 hover:border-luxury-300 transition-all duration-300">
+                  <SelectTrigger className="h-12 rounded-2xl border border-hotel-200 bg-white px-3 shadow-sm transition-all duration-300 hover:border-luxury-300 focus:border-luxury-500 focus:ring-luxury-500">
                     <div className="flex items-center">
-                      <Users className="w-5 h-5 mr-3 text-luxury-500" />
+                      <Users className="mr-3 h-4.5 w-4.5 text-luxury-500" />
                       <SelectValue />
                     </div>
                   </SelectTrigger>
@@ -192,30 +192,22 @@ export default function Hero() {
 
               <div className="flex items-end">
                 <Button
-                  type="submit"
-                  className="w-full h-12 btn-luxury font-semibold text-lg rounded-xl hover-lift tracking-wide"
+                  asChild
+                  className="h-12 w-full rounded-2xl btn-luxury px-6 text-base font-semibold tracking-wide lg:min-w-[210px]"
                 >
-                  Search Rooms
+                  <Link to="/rooms">Search Availability</Link>
                 </Button>
               </div>
             </form>
 
-            {/* Enhanced Additional Info */}
-            <div className="mt-8 pt-6 border-t border-luxury-200/30">
-              <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-hotel-600">
-                <div className="flex items-center space-x-6 mb-4 sm:mb-0">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 luxury-gradient rounded-full"></div>
-                    <span className="font-medium">Best Rate Guaranteed</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 luxury-gradient rounded-full"></div>
-                    <span className="font-medium">Free Cancellation</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 luxury-gradient rounded-full"></div>
-                    <span className="font-medium">No Booking Fees</span>
-                  </div>
+            <div className="mt-4 border-t border-luxury-200/50 pt-4">
+              <div className="flex flex-col gap-3 text-sm text-hotel-600 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-wrap items-center gap-3">
+                  <span className="font-medium text-hotel-700">
+                    Premium direct booking widget
+                  </span>
+                  <span className="hidden h-1 w-1 rounded-full bg-luxury-400 sm:block" />
+                  <span>No booking fees</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className="text-hotel-500">Need assistance?</span>
@@ -230,6 +222,15 @@ export default function Hero() {
             </div>
           </CardContent>
         </Card>
+
+        <div className="mt-8 flex justify-center">
+          <div className="flex flex-col items-center space-y-2 floating">
+            <span className="text-xs font-medium tracking-wider text-white/70">
+              SCROLL DOWN
+            </span>
+            <ChevronDown className="h-6 w-6 text-white/70 pulse-luxury" />
+          </div>
+        </div>
       </div>
     </section>
   );
