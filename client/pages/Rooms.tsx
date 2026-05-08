@@ -1,16 +1,13 @@
+import { FormEvent, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { rooms } from "@/data/rooms";
 import {
   Star,
-  Wifi,
-  Car,
-  Coffee,
-  Waves,
-  Utensils,
   Users,
   Bed,
   ArrowLeft,
@@ -21,329 +18,204 @@ import {
   Maximize,
   Eye,
   Crown,
-  Filter,
-  SortDesc,
 } from "lucide-react";
 
 export default function Rooms() {
-  const rooms = [
-    {
-      id: 1,
-      name: "Deluxe Ocean View",
-      price: 299,
-      originalPrice: 349,
-      image:
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070",
-      images: [
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070",
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070",
-      ],
-      size: "42m²",
-      beds: "1 King Bed",
-      occupancy: "2 Adults",
-      view: "Ocean View",
-      amenities: [
-        "Free WiFi",
-        "Mini Bar",
-        "Ocean View",
-        "Room Service",
-        "Air Conditioning",
-      ],
-      description:
-        "Elegant room with breathtaking ocean views and modern amenities for the perfect getaway.",
-      features: ["Ocean View", "King Bed", "42m²"],
-      rating: 4.8,
-      reviews: 127,
-    },
-    {
-      id: 2,
-      name: "Executive Suite",
-      price: 499,
-      originalPrice: 599,
-      image:
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-      images: [
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070",
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070",
-      ],
-      size: "65m²",
-      beds: "1 King Bed",
-      occupancy: "2-3 Adults",
-      view: "City View",
-      amenities: [
-        "Free WiFi",
-        "Living Area",
-        "City View",
-        "Executive Lounge",
-        "Premium Toiletries",
-      ],
-      description:
-        "Spacious suite with separate living area and premium city views for business and leisure travelers.",
-      features: ["City View", "Living Area", "65m²"],
-      rating: 4.9,
-      reviews: 89,
-    },
-    {
-      id: 3,
-      name: "Presidential Suite",
-      price: 899,
-      originalPrice: 1099,
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070",
-      images: [
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070",
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070",
-      ],
-      size: "120m²",
-      beds: "1 King Bed + Sofa Bed",
-      occupancy: "4 Adults",
-      view: "Panoramic View",
-      amenities: [
-        "Free WiFi",
-        "Private Terrace",
-        "Butler Service",
-        "Jacuzzi",
-        "Premium Bar",
-      ],
-      description:
-        "The ultimate luxury experience with panoramic views, private terrace, and dedicated butler service.",
-      features: ["Panoramic View", "Private Terrace", "120m²"],
-      rating: 5.0,
-      reviews: 56,
-    },
-    {
-      id: 4,
-      name: "Garden Villa",
-      price: 699,
-      originalPrice: 799,
-      image:
-        "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?q=80&w=2070",
-      images: [
-        "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?q=80&w=2070",
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070",
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-      ],
-      size: "85m²",
-      beds: "1 King Bed",
-      occupancy: "2 Adults",
-      view: "Garden View",
-      amenities: [
-        "Free WiFi",
-        "Private Garden",
-        "Outdoor Shower",
-        "Kitchenette",
-        "BBQ Area",
-      ],
-      description:
-        "Private villa with beautiful garden setting, perfect for romantic getaways and special occasions.",
-      features: ["Garden View", "Private Garden", "85m²"],
-      rating: 4.7,
-      reviews: 73,
-    },
-    {
-      id: 5,
-      name: "Family Suite",
-      price: 549,
-      originalPrice: 649,
-      image:
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=2126",
-      images: [
-        "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?q=80&w=2126",
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070",
-      ],
-      size: "75m²",
-      beds: "1 King + 2 Twin Beds",
-      occupancy: "4-6 Adults",
-      view: "Pool View",
-      amenities: [
-        "Free WiFi",
-        "Connecting Rooms",
-        "Kids Amenities",
-        "Pool Access",
-        "Game Console",
-      ],
-      description:
-        "Perfect for families with connecting rooms, kids amenities, and direct pool access.",
-      features: ["Pool View", "Family Friendly", "75m²"],
-      rating: 4.6,
-      reviews: 112,
-    },
-    {
-      id: 6,
-      name: "Penthouse Suite",
-      price: 1299,
-      originalPrice: 1499,
-      image:
-        "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070",
-      images: [
-        "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070",
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?q=80&w=2070",
-        "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?q=80&w=2070",
-      ],
-      size: "200m²",
-      beds: "2 King Beds + Living Area",
-      occupancy: "6 Adults",
-      view: "360° City View",
-      amenities: [
-        "Free WiFi",
-        "Private Elevator",
-        "Rooftop Terrace",
-        "Personal Chef",
-        "Helicopter Pad",
-      ],
-      description:
-        "The crown jewel of luxury accommodations with 360-degree city views and exclusive amenities.",
-      features: ["360° View", "Rooftop Terrace", "200m²"],
-      rating: 5.0,
-      reviews: 28,
-    },
-  ];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
+  const [checkOut, setCheckOut] = useState(searchParams.get("checkOut") || "");
+  const [guests, setGuests] = useState(searchParams.get("guests") || "2");
+  const [roomType, setRoomType] = useState(searchParams.get("roomType") || "all");
+
+  const filteredRooms = useMemo(() => {
+    if (roomType === "all") {
+      return rooms;
+    }
+
+    return rooms.filter((room) =>
+      room.name.toLowerCase().includes(roomType.toLowerCase()),
+    );
+  }, [roomType]);
+
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const nextParams = new URLSearchParams();
+    if (checkIn) nextParams.set("checkIn", checkIn);
+    if (checkOut) nextParams.set("checkOut", checkOut);
+    if (guests) nextParams.set("guests", guests);
+    if (roomType && roomType !== "all") nextParams.set("roomType", roomType);
+    setSearchParams(nextParams);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
 
-      {/* Header */}
-      <section className="pt-24 pb-12 bg-gradient-to-r from-hotel-50 to-luxury-50">
+      <section className="bg-gradient-to-r from-hotel-50 to-luxury-50 pb-12 pt-24">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center mb-6">
+          <div className="mb-6 flex items-center">
             <Button
               variant="ghost"
               asChild
-              className="text-luxury-600 hover:text-luxury-700 p-0 mr-4"
+              className="mr-4 p-0 text-luxury-600 hover:text-luxury-700"
             >
               <Link to="/">
-                <ArrowLeft className="w-5 h-5 mr-2" />
+                <ArrowLeft className="mr-2 h-5 w-5" />
                 Back to Home
               </Link>
             </Button>
           </div>
-          <div className="flex items-center space-x-3 mb-4">
-            <Crown className="w-8 h-8 text-luxury-600" />
-            <span className="text-luxury-600 font-medium text-lg">
+          <div className="mb-4 flex items-center space-x-3">
+            <Crown className="h-8 w-8 text-luxury-600" />
+            <span className="text-lg font-medium text-luxury-600">
               Golden Oasis Collection
             </span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-hotel-900 mb-4">
+          <h1 className="mb-4 text-4xl font-bold text-hotel-900 md:text-6xl">
             Luxury Accommodations
           </h1>
-          <p className="text-xl text-hotel-600 max-w-3xl">
+          <p className="max-w-3xl text-xl text-hotel-600">
             Discover our collection of elegantly appointed rooms and suites,
             each designed to provide the ultimate in comfort and sophistication.
-            Every detail crafted to exceed your expectations.
           </p>
         </div>
       </section>
 
-      {/* Quick Booking */}
-      <section className="py-8 bg-white border-b border-border">
+      <section className="border-b border-border bg-white py-8">
         <div className="max-w-7xl mx-auto px-4">
-          <Card className="bg-card border border-border shadow-lg">
+          <Card className="border border-border bg-card shadow-lg">
             <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <form
+                className="grid grid-cols-1 gap-4 md:grid-cols-4 xl:grid-cols-[1fr_1fr_0.8fr_0.9fr_auto]"
+                onSubmit={handleSearchSubmit}
+              >
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
                     Check-in
                   </label>
-                  <div className="p-3 border border-border rounded-lg bg-background cursor-pointer hover:border-hotel-300 transition-colors">
-                    <div className="text-sm text-muted-foreground">
-                      Select date
-                    </div>
-                  </div>
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="flex h-12 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
                     Check-out
                   </label>
-                  <div className="p-3 border border-border rounded-lg bg-background cursor-pointer hover:border-hotel-300 transition-colors">
-                    <div className="text-sm text-muted-foreground">
-                      Select date
-                    </div>
-                  </div>
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="flex h-12 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
                     Guests
                   </label>
-                  <div className="p-3 border border-border rounded-lg bg-background cursor-pointer hover:border-hotel-300 transition-colors flex items-center">
-                    <Users className="w-4 h-4 mr-2 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">
-                      2 Adults
-                    </span>
-                  </div>
+                  <input
+                    type="number"
+                    min="1"
+                    value={guests}
+                    onChange={(e) => setGuests(e.target.value)}
+                    className="flex h-12 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  <label className="mb-2 block text-sm font-medium text-muted-foreground">
                     Room Type
                   </label>
-                  <div className="p-3 border border-border rounded-lg bg-background cursor-pointer hover:border-hotel-300 transition-colors">
-                    <div className="text-sm text-muted-foreground">
-                      All Rooms
-                    </div>
-                  </div>
+                  <select
+                    value={roomType}
+                    onChange={(e) => setRoomType(e.target.value)}
+                    className="flex h-12 w-full rounded-lg border border-border bg-background px-3 text-sm"
+                  >
+                    <option value="all">All Rooms</option>
+                    <option value="deluxe">Deluxe</option>
+                    <option value="suite">Suite</option>
+                    <option value="villa">Villa</option>
+                    <option value="family">Family</option>
+                    <option value="penthouse">Penthouse</option>
+                  </select>
                 </div>
                 <div className="flex items-end">
-                  <Button className="w-full bg-hotel-600 hover:bg-hotel-700 text-white h-12">
+                  <Button
+                    type="submit"
+                    className="h-12 w-full bg-hotel-600 text-white hover:bg-hotel-700"
+                  >
                     Update Search
                   </Button>
                 </div>
-              </div>
+              </form>
             </CardContent>
           </Card>
         </div>
       </section>
 
-      {/* Rooms Grid */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {rooms.map((room) => (
+          <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-hotel-900">
+                Available rooms
+              </h2>
+              <p className="text-hotel-600">
+                {filteredRooms.length} curated option
+                {filteredRooms.length === 1 ? "" : "s"} for your stay.
+              </p>
+            </div>
+            <Button asChild variant="outline" className="border-luxury-300 text-luxury-700 hover:bg-luxury-50">
+              <Link to="/booking">Submit payment proof</Link>
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            {filteredRooms.map((room) => (
               <Card
                 key={room.id}
-                className="group overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300"
+                className="group overflow-hidden border-0 shadow-lg transition-all duration-300 hover:shadow-2xl"
               >
                 <div className="relative">
                   <div className="relative h-80 overflow-hidden">
                     <div
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-110 transition-transform duration-500"
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                       style={{ backgroundImage: `url('${room.image}')` }}
-                    ></div>
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-luxury-500 text-hotel-900 font-semibold">
+                    />
+                    <div className="absolute left-4 top-4">
+                      <Badge className="bg-luxury-500 font-semibold text-hotel-900">
                         ${room.price}/night
                       </Badge>
                       {room.originalPrice > room.price && (
-                        <Badge
-                          variant="secondary"
-                          className="ml-2 line-through"
-                        >
+                        <Badge variant="secondary" className="ml-2 line-through">
                           ${room.originalPrice}
                         </Badge>
                       )}
                     </div>
-                    <div className="absolute top-4 right-4 flex space-x-2">
+                    <div className="absolute right-4 top-4 flex space-x-2">
                       <Button
+                        asChild
                         size="sm"
                         variant="secondary"
                         className="bg-white/90 hover:bg-white"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Link to={`/rooms/${room.id}`} aria-label={`View ${room.name} details`}>
+                          <Eye className="h-4 w-4" />
+                        </Link>
                       </Button>
                     </div>
                   </div>
                 </div>
 
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-3">
+                  <div className="mb-3 flex items-start justify-between gap-4">
                     <h3 className="text-2xl font-bold text-hotel-900">
                       {room.name}
                     </h3>
                     <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 fill-luxury-400 text-luxury-400" />
+                      <Star className="h-4 w-4 fill-luxury-400 text-luxury-400" />
                       <span className="text-sm font-medium">{room.rating}</span>
                       <span className="text-sm text-muted-foreground">
                         ({room.reviews})
@@ -351,32 +223,30 @@ export default function Rooms() {
                     </div>
                   </div>
 
-                  <p className="text-muted-foreground mb-4">
-                    {room.description}
-                  </p>
+                  <p className="mb-4 text-muted-foreground">{room.description}</p>
 
-                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                  <div className="mb-4 grid grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center space-x-2">
-                      <Maximize className="w-4 h-4 text-hotel-600" />
+                      <Maximize className="h-4 w-4 text-hotel-600" />
                       <span>{room.size}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Bed className="w-4 h-4 text-hotel-600" />
+                      <Bed className="h-4 w-4 text-hotel-600" />
                       <span>{room.beds}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Users className="w-4 h-4 text-hotel-600" />
+                      <Users className="h-4 w-4 text-hotel-600" />
                       <span>{room.occupancy}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Eye className="w-4 h-4 text-hotel-600" />
+                      <Eye className="h-4 w-4 text-hotel-600" />
                       <span>{room.view}</span>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {room.amenities.slice(0, 4).map((amenity, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {room.amenities.slice(0, 4).map((amenity) => (
+                      <Badge key={amenity} variant="secondary" className="text-xs">
                         {amenity}
                       </Badge>
                     ))}
@@ -387,7 +257,7 @@ export default function Rooms() {
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="text-2xl font-bold text-hotel-900">
                         ${room.price}
@@ -396,21 +266,24 @@ export default function Rooms() {
                         </span>
                       </div>
                       {room.originalPrice > room.price && (
-                        <div className="text-sm text-muted-foreground line-through">
+                        <div className="text-sm line-through text-muted-foreground">
                           ${room.originalPrice}
                         </div>
                       )}
                     </div>
-                    <div className="space-x-2">
+                    <div className="flex flex-col gap-3 sm:flex-row">
                       <Button
+                        asChild
                         variant="outline"
                         className="border-hotel-600 text-hotel-600 hover:bg-hotel-50"
                       >
-                        View Details
+                        <Link to={`/rooms/${room.id}`}>View Details</Link>
                       </Button>
-                      <Button className="bg-hotel-600 hover:bg-hotel-700 text-white">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Book Now
+                      <Button asChild className="bg-hotel-600 text-white hover:bg-hotel-700">
+                        <Link to={`/booking?room=${encodeURIComponent(room.name)}`}>
+                          <Calendar className="mr-2 h-4 w-4" />
+                          Book Now
+                        </Link>
                       </Button>
                     </div>
                   </div>
@@ -421,36 +294,32 @@ export default function Rooms() {
         </div>
       </section>
 
-      {/* Contact & Booking */}
-      <section className="py-20 bg-hotel-900 text-white">
+      <section className="bg-hotel-900 py-20 text-white">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-4xl font-bold mb-8">Need Assistance?</h2>
-              <p className="text-gray-300 mb-8 text-lg">
-                Our reservation specialists are available 24/7 to help you find
-                the perfect accommodation and create unforgettable experiences
-                at Golden Oasis.
+              <h2 className="mb-8 text-4xl font-bold">Need Assistance?</h2>
+              <p className="mb-8 text-lg text-gray-300">
+                Our reservation specialists are available to help you find the
+                ideal accommodation and complete your stay request.
               </p>
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
-                  <Phone className="w-6 h-6 text-luxury-400 mt-1" />
+                  <Phone className="mt-1 h-6 w-6 text-luxury-400" />
                   <div>
                     <div className="font-semibold">Reservations</div>
-                    <div className="text-gray-300">+1 (555) 123-4567</div>
+                    <div className="text-gray-300">0911908407</div>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <Mail className="w-6 h-6 text-luxury-400 mt-1" />
+                  <Mail className="mt-1 h-6 w-6 text-luxury-400" />
                   <div>
                     <div className="font-semibold">Email</div>
-                    <div className="text-gray-300">
-                      reservations@goldenoasis.com
-                    </div>
+                    <div className="text-gray-300">brookhishe@gmail.com</div>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
-                  <MapPin className="w-6 h-6 text-luxury-400 mt-1" />
+                  <MapPin className="mt-1 h-6 w-6 text-luxury-400" />
                   <div>
                     <div className="font-semibold">Address</div>
                     <div className="text-gray-300">
@@ -460,41 +329,41 @@ export default function Rooms() {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-800 rounded-lg p-8">
-              <h3 className="text-2xl font-bold mb-6">Exclusive Offers</h3>
+            <div className="rounded-lg bg-gray-800 p-8">
+              <h3 className="mb-6 text-2xl font-bold">Exclusive Offers</h3>
               <div className="space-y-4">
-                <div className="p-4 bg-gray-700 rounded-lg">
+                <div className="rounded-lg bg-gray-700 p-4">
                   <div className="font-semibold text-luxury-400">
                     Golden Circle Member
                   </div>
                   <div className="text-sm text-gray-300">
-                    Save up to 30% with our exclusive loyalty program
+                    Save up to 30% with our exclusive loyalty program.
                   </div>
                 </div>
-                <div className="p-4 bg-gray-700 rounded-lg">
+                <div className="rounded-lg bg-gray-700 p-4">
                   <div className="font-semibold text-luxury-400">
                     Extended Oasis Stay
                   </div>
                   <div className="text-sm text-gray-300">
-                    Stay 4 nights or more and receive complimentary spa access
+                    Stay 4 nights or more and receive complimentary spa access.
                   </div>
                 </div>
-                <div className="p-4 bg-gray-700 rounded-lg">
+                <div className="rounded-lg bg-gray-700 p-4">
                   <div className="font-semibold text-luxury-400">
                     Luxury Weekend
                   </div>
                   <div className="text-sm text-gray-300">
-                    Special weekend packages with fine dining included
+                    Special weekend packages with fine dining included.
                   </div>
                 </div>
               </div>
               <Button
                 asChild
                 size="lg"
-                className="w-full mt-6 luxury-gradient text-hotel-900 hover:opacity-90"
+                className="mt-6 w-full luxury-gradient text-hotel-900 hover:opacity-90"
               >
                 <Link to="/booking">
-                  <Calendar className="w-5 h-5 mr-2" />
+                  <Calendar className="mr-2 h-5 w-5" />
                   Book with Offers
                 </Link>
               </Button>

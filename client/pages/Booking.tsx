@@ -1,5 +1,5 @@
-import { ChangeEvent, FormEvent, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -67,12 +67,23 @@ const paymentMethodOptions = [
 ];
 
 export default function Booking() {
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState<PaymentProofFormState>(initialFormState);
   const [screenshot, setScreenshot] = useState<File | null>(null);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fileInputKey, setFileInputKey] = useState(0);
+
+  useEffect(() => {
+    setForm((current) => ({
+      ...current,
+      roomName: searchParams.get("room") || current.roomName,
+      checkIn: searchParams.get("checkIn") || current.checkIn,
+      checkOut: searchParams.get("checkOut") || current.checkOut,
+      guests: searchParams.get("guests") || current.guests,
+    }));
+  }, [searchParams]);
 
   const staySummary = useMemo(() => {
     if (!form.checkIn || !form.checkOut) {

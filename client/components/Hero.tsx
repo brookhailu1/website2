@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { FormEvent, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import {
   Calendar,
   Users,
   ArrowRight,
-  PlayCircle,
+  ImageIcon,
   ChevronDown,
   Sparkles,
 } from "lucide-react";
@@ -24,81 +24,88 @@ export default function Hero() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState("2");
+  const navigate = useNavigate();
+
+  const handleAvailabilitySubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const params = new URLSearchParams();
+    if (checkIn) params.set("checkIn", checkIn);
+    if (checkOut) params.set("checkOut", checkOut);
+    if (guests) params.set("guests", guests);
+
+    const search = params.toString();
+    navigate(search ? `/rooms?${search}` : "/rooms");
+  };
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden pb-16 pt-28 md:pb-20">
-      {/* Parallax Background */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-r from-hotel-900/90 via-hotel-800/70 to-hotel-900/90 z-10"></div>
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-hotel-900/90 via-hotel-800/70 to-hotel-900/90" />
         <div
           className="absolute inset-0 parallax-bg scale-110 hero-zoom-slow ease-linear hover:scale-105"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')`,
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop')",
           }}
-        ></div>
-
-        {/* Enhanced Floating Elements */}
-        <div className="absolute top-20 left-10 w-3 h-3 luxury-gradient rounded-full floating pulse-luxury"></div>
-        <div className="absolute top-40 right-20 w-2 h-2 bg-luxury-300 rounded-full floating animation-delay-1000"></div>
-        <div className="absolute bottom-32 left-1/4 w-2.5 h-2.5 bg-luxury-500 rounded-full floating animation-delay-500"></div>
-        <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-luxury-200 rounded-full floating animation-delay-2000"></div>
-        <div className="absolute bottom-40 right-10 w-1.5 h-1.5 bg-luxury-400 rounded-full floating animation-delay-1500"></div>
-
-        {/* Shimmer overlay */}
-        <div className="absolute inset-0 shimmer opacity-30 z-5"></div>
+        />
+        <div className="absolute bottom-32 left-1/4 h-2.5 w-2.5 rounded-full bg-luxury-500 floating animation-delay-500" />
+        <div className="absolute bottom-40 right-10 h-1.5 w-1.5 rounded-full bg-luxury-400 floating animation-delay-1500" />
+        <div className="absolute left-10 top-20 h-3 w-3 rounded-full luxury-gradient floating pulse-luxury" />
+        <div className="absolute right-20 top-40 h-2 w-2 rounded-full bg-luxury-300 floating animation-delay-1000" />
+        <div className="absolute right-1/3 top-1/3 h-1 w-1 rounded-full bg-luxury-200 floating animation-delay-2000" />
+        <div className="absolute inset-0 z-5 shimmer opacity-30" />
       </div>
 
-      {/* Content */}
       <div className="relative z-20 mx-auto flex w-full max-w-6xl flex-col px-4 pt-12 text-center text-white">
-        {/* Luxury Badge */}
-        <div className="inline-flex items-center space-x-2 glass-effect rounded-full px-6 py-3 mb-8 border border-white/30 scale-in">
-          <Sparkles className="w-5 h-5 text-luxury-400 pulse-luxury" />
+        <div className="mb-8 inline-flex items-center space-x-2 self-center rounded-full border border-white/30 glass-effect px-6 py-3 scale-in">
+          <Sparkles className="h-5 w-5 text-luxury-400 pulse-luxury" />
           <span className="text-sm font-semibold tracking-wider luxury-text-shadow">
             5-STAR LUXURY EXPERIENCE
           </span>
         </div>
 
-        {/* Main Heading with Enhanced Typography */}
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-8 leading-tight fade-in luxury-text-shadow">
-          <span className="block mb-2">Welcome to</span>
-          <span className="block text-luxury-400 font-serif italic relative">
+        <h1 className="mb-8 text-5xl font-bold leading-tight fade-in luxury-text-shadow md:text-7xl lg:text-8xl">
+          <span className="mb-2 block">Welcome to</span>
+          <span className="relative block font-serif italic text-luxury-400">
             Golden Oasis
-            <div className="absolute -top-4 -right-8 w-12 h-12 luxury-gradient rounded-full opacity-30 floating"></div>
+            <div className="absolute -right-8 -top-4 h-12 w-12 rounded-full luxury-gradient opacity-30 floating" />
           </span>
         </h1>
 
-        {/* Enhanced Subtitle */}
-        <div className="slide-up max-w-4xl mx-auto mb-12">
-          <p className="text-xl md:text-2xl lg:text-3xl mb-4 opacity-95 leading-relaxed luxury-text-shadow">
+        <div className="mx-auto mb-12 max-w-4xl slide-up">
+          <p className="mb-4 text-xl leading-relaxed opacity-95 luxury-text-shadow md:text-2xl lg:text-3xl">
             Where luxury meets tranquility in the heart of the city.
           </p>
-          <p className="text-lg md:text-xl text-luxury-200 opacity-90 leading-relaxed">
+          <p className="text-lg leading-relaxed text-luxury-200 opacity-90 md:text-xl">
             Experience unparalleled elegance and personalized service that
             creates unforgettable memories.
           </p>
         </div>
 
-        {/* Enhanced CTA Buttons */}
         <div className="mb-10 flex flex-col justify-center gap-6 scale-in sm:flex-row md:mb-12">
           <Button
             asChild
             size="lg"
-            className="btn-luxury text-lg px-10 py-7 h-auto group hover-lift rounded-xl"
+            className="group h-auto rounded-xl px-10 py-7 text-lg btn-luxury hover-lift"
           >
             <Link to="/booking">
-              <Calendar className="w-6 h-6 mr-3" />
+              <Calendar className="mr-3 h-6 w-6" />
               Reserve Your Stay
-              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-2 transition-transform duration-300" />
+              <ArrowRight className="ml-3 h-6 w-6 transition-transform duration-300 group-hover:translate-x-2" />
             </Link>
           </Button>
 
           <Button
+            asChild
             size="lg"
             variant="outline"
-            className="border-2 border-white/80 text-white hover:bg-white hover:text-hotel-900 text-lg px-10 py-7 h-auto glass-effect group hover-lift rounded-xl backdrop-blur-lg"
+            className="group h-auto rounded-xl border-2 border-white/80 px-10 py-7 text-lg text-white glass-effect backdrop-blur-lg hover:bg-white hover:text-hotel-900 hover-lift"
           >
-            <PlayCircle className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
-            Virtual Tour
+            <Link to="/gallery">
+              <ImageIcon className="mr-3 h-6 w-6 transition-transform group-hover:scale-110" />
+              View Gallery
+            </Link>
           </Button>
         </div>
 
@@ -127,17 +134,20 @@ export default function Hero() {
               </div>
             </div>
 
-            <form className="grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1.1fr_0.85fr_auto] lg:items-end">
+            <form
+              className="grid grid-cols-1 gap-4 lg:grid-cols-[1.1fr_1.1fr_0.85fr_auto] lg:items-end"
+              onSubmit={handleAvailabilitySubmit}
+            >
               <div className="space-y-2">
                 <Label
-                  htmlFor="checkin"
-                  className="text-sm font-semibold text-hotel-700 tracking-wide"
+                  htmlFor="hero-checkin"
+                  className="text-sm font-semibold tracking-wide text-hotel-700"
                 >
                   Check-in Date
                 </Label>
-                <div className="relative group">
+                <div className="group relative">
                   <Input
-                    id="checkin"
+                    id="hero-checkin"
                     type="date"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
@@ -149,14 +159,14 @@ export default function Hero() {
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="checkout"
-                  className="text-sm font-semibold text-hotel-700 tracking-wide"
+                  htmlFor="hero-checkout"
+                  className="text-sm font-semibold tracking-wide text-hotel-700"
                 >
                   Check-out Date
                 </Label>
-                <div className="relative group">
+                <div className="group relative">
                   <Input
-                    id="checkout"
+                    id="hero-checkout"
                     type="date"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
@@ -168,13 +178,16 @@ export default function Hero() {
 
               <div className="space-y-2">
                 <Label
-                  htmlFor="guests"
-                  className="text-sm font-semibold text-hotel-700 tracking-wide"
+                  htmlFor="hero-guests"
+                  className="text-sm font-semibold tracking-wide text-hotel-700"
                 >
                   Guests
                 </Label>
                 <Select value={guests} onValueChange={setGuests}>
-                  <SelectTrigger className="h-12 rounded-2xl border border-hotel-200 bg-white px-3 shadow-sm transition-all duration-300 hover:border-luxury-300 focus:border-luxury-500 focus:ring-luxury-500">
+                  <SelectTrigger
+                    id="hero-guests"
+                    className="h-12 rounded-2xl border border-hotel-200 bg-white px-3 shadow-sm transition-all duration-300 hover:border-luxury-300 focus:border-luxury-500 focus:ring-luxury-500"
+                  >
                     <div className="flex items-center">
                       <Users className="mr-3 h-4.5 w-4.5 text-luxury-500" />
                       <SelectValue />
@@ -192,10 +205,10 @@ export default function Hero() {
 
               <div className="flex items-end">
                 <Button
-                  asChild
-                  className="h-12 w-full rounded-2xl btn-luxury px-6 text-base font-semibold tracking-wide lg:min-w-[210px]"
+                  type="submit"
+                  className="h-12 w-full rounded-2xl px-6 text-base font-semibold tracking-wide btn-luxury lg:min-w-[210px]"
                 >
-                  <Link to="/rooms">Search Availability</Link>
+                  Search Availability
                 </Button>
               </div>
             </form>
@@ -213,7 +226,7 @@ export default function Hero() {
                   <span className="text-hotel-500">Need assistance?</span>
                   <Link
                     to="/contact"
-                    className="text-luxury-600 hover:text-luxury-700 font-semibold underline decoration-luxury-300 underline-offset-2 hover:decoration-luxury-500 transition-all"
+                    className="font-semibold text-luxury-600 underline decoration-luxury-300 underline-offset-2 transition-all hover:text-luxury-700 hover:decoration-luxury-500"
                   >
                     Contact our concierge
                   </Link>

@@ -4,10 +4,8 @@ import {
   MapPin,
   Phone,
   Mail,
-  Facebook,
   Instagram,
   Twitter,
-  Youtube,
   Wifi,
   Car,
   Coffee,
@@ -17,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
 
 const quickLinks = [
   { name: "Rooms & Suites", href: "/rooms" },
@@ -27,18 +26,23 @@ const quickLinks = [
 ];
 
 const services = [
-  { name: "Spa & Wellness", href: "/facilities#spa" },
-  { name: "Fine Dining", href: "/facilities#dining" },
-  { name: "Business Center", href: "/facilities#business" },
-  { name: "Event Venues", href: "/facilities#events" },
+  { name: "Spa & Wellness", href: "/facilities" },
+  { name: "Fine Dining", href: "/facilities" },
+  { name: "Business Center", href: "/facilities" },
+  { name: "Event Venues", href: "/facilities" },
   { name: "Concierge", href: "/contact" },
 ];
 
 const policies = [
-  { name: "Privacy Policy", href: "/privacy" },
-  { name: "Terms & Conditions", href: "/terms" },
-  { name: "Cancellation Policy", href: "/cancellation" },
-  { name: "Cookie Policy", href: "/cookies" },
+  { name: "Privacy Policy", href: "/policies#privacy" },
+  { name: "Terms & Conditions", href: "/policies#terms" },
+  { name: "Cancellation Policy", href: "/policies#cancellation" },
+  { name: "Cookie Policy", href: "/policies#cookies" },
+];
+
+const socialLabels = [
+  { icon: Instagram, label: "Instagram: brookhailu1" },
+  { icon: Twitter, label: "Twitter: @brookhailu1" },
 ];
 
 const amenityIcons = [
@@ -53,24 +57,32 @@ const amenityIcons = [
 export default function Footer() {
   return (
     <footer className="bg-hotel-900 text-white">
-      {/* Newsletter Section */}
       <div className="border-b border-hotel-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center max-w-2xl mx-auto">
-            <h3 className="text-2xl font-bold mb-4">
+          <div className="max-w-2xl mx-auto text-center">
+            <h3 className="mb-4 text-2xl font-bold">
               Stay Connected with Golden Oasis
             </h3>
-            <p className="text-hotel-300 mb-6">
-              Subscribe to our newsletter for exclusive offers, luxury travel
-              tips, and updates on our latest amenities.
+            <p className="mb-6 text-hotel-300">
+              Subscribe for future offers, curated stay updates, and hotel news.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <div className="mx-auto flex max-w-md flex-col gap-3 sm:flex-row">
               <Input
                 type="email"
                 placeholder="Enter your email address"
-                className="flex-1 bg-hotel-800 border-hotel-600 text-white placeholder:text-hotel-400 focus:ring-luxury-500 focus:border-luxury-500"
+                className="flex-1 border-hotel-600 bg-hotel-800 text-white placeholder:text-hotel-400 focus:border-luxury-500 focus:ring-luxury-500"
               />
-              <Button className="luxury-gradient text-hotel-900 hover:opacity-90">
+              <Button
+                type="button"
+                className="luxury-gradient text-hotel-900 hover:opacity-90"
+                onClick={() =>
+                  toast({
+                    title: "Newsletter signup coming soon",
+                    description:
+                      "The newsletter form is not active yet, but the rest of the site navigation is live.",
+                  })
+                }
+              >
                 Subscribe
               </Button>
             </div>
@@ -78,70 +90,64 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* Hotel Info */}
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
-            <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 luxury-gradient rounded-lg flex items-center justify-center">
-                <Crown className="w-6 h-6 text-hotel-900" />
+            <div className="mb-6 flex items-center space-x-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg luxury-gradient">
+                <Crown className="h-6 w-6 text-hotel-900" />
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold leading-tight">
                   Golden Oasis
                 </span>
-                <span className="text-xs text-luxury-400 font-medium tracking-wide">
+                <span className="text-xs font-medium tracking-wide text-luxury-400">
                   BOUTIQUE HOTEL
                 </span>
               </div>
             </div>
-            <p className="text-hotel-300 mb-6 text-sm leading-relaxed">
+            <p className="mb-6 text-sm leading-relaxed text-hotel-300">
               Experience unparalleled luxury and elegance in the heart of the
-              city. Where every moment becomes a cherished memory.
+              city, where every moment becomes a cherished memory.
             </p>
 
-            {/* Contact Info */}
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-luxury-400 mt-0.5 flex-shrink-0" />
+                <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-luxury-400" />
                 <div className="text-sm">
                   <div className="font-medium">123 Luxury Boulevard</div>
-                  <div className="text-hotel-300">
-                    Downtown District, NY 10001
-                  </div>
+                  <div className="text-hotel-300">Downtown District, NY 10001</div>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-luxury-400 flex-shrink-0" />
+                <Phone className="h-5 w-5 flex-shrink-0 text-luxury-400" />
                 <a
-                  href="tel:+15551234567"
-                  className="text-sm hover:text-luxury-400 transition-colors"
+                  href="tel:0911908407"
+                  className="text-sm transition-colors hover:text-luxury-400"
                 >
-                  +1 (555) 123-4567
+                  0911908407
                 </a>
               </div>
               <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-luxury-400 flex-shrink-0" />
+                <Mail className="h-5 w-5 flex-shrink-0 text-luxury-400" />
                 <a
-                  href="mailto:info@goldenoasis.com"
-                  className="text-sm hover:text-luxury-400 transition-colors"
+                  href="mailto:brookhishe@gmail.com"
+                  className="text-sm transition-colors hover:text-luxury-400"
                 >
-                  info@goldenoasis.com
+                  brookhishe@gmail.com
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Quick Links</h4>
+            <h4 className="mb-6 text-lg font-semibold">Quick Links</h4>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <Link
                     to={link.href}
-                    className="text-sm text-hotel-300 hover:text-luxury-400 transition-colors"
+                    className="text-sm text-hotel-300 transition-colors hover:text-luxury-400"
                   >
                     {link.name}
                   </Link>
@@ -150,15 +156,14 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Services */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Services</h4>
+            <h4 className="mb-6 text-lg font-semibold">Services</h4>
             <ul className="space-y-3">
               {services.map((service) => (
                 <li key={service.name}>
                   <Link
                     to={service.href}
-                    className="text-sm text-hotel-300 hover:text-luxury-400 transition-colors"
+                    className="text-sm text-hotel-300 transition-colors hover:text-luxury-400"
                   >
                     {service.name}
                   </Link>
@@ -167,27 +172,24 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Amenities & Policies */}
           <div>
-            <h4 className="text-lg font-semibold mb-6">Amenities</h4>
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {amenityIcons.map((amenity, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <amenity.icon className="w-4 h-4 text-luxury-400" />
-                  <span className="text-xs text-hotel-300">
-                    {amenity.label}
-                  </span>
+            <h4 className="mb-6 text-lg font-semibold">Amenities</h4>
+            <div className="mb-8 grid grid-cols-2 gap-3">
+              {amenityIcons.map((amenity) => (
+                <div key={amenity.label} className="flex items-center space-x-2">
+                  <amenity.icon className="h-4 w-4 text-luxury-400" />
+                  <span className="text-xs text-hotel-300">{amenity.label}</span>
                 </div>
               ))}
             </div>
 
-            <h5 className="font-medium mb-3">Policies</h5>
+            <h5 className="mb-3 font-medium">Policies</h5>
             <ul className="space-y-2">
               {policies.map((policy) => (
                 <li key={policy.name}>
                   <Link
                     to={policy.href}
-                    className="text-xs text-hotel-400 hover:text-luxury-400 transition-colors"
+                    className="text-xs text-hotel-400 transition-colors hover:text-luxury-400"
                   >
                     {policy.name}
                   </Link>
@@ -198,54 +200,32 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
       <div className="border-t border-hotel-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <div className="text-sm text-hotel-400">
               © 2024 Golden Oasis Boutique Hotel. All rights reserved.
             </div>
 
-            {/* Social Media Links */}
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-hotel-400 mr-2">Follow us:</span>
-              <a
-                href="#"
-                className="text-hotel-400 hover:text-luxury-400 transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="text-hotel-400 hover:text-luxury-400 transition-colors"
-                aria-label="Instagram"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="text-hotel-400 hover:text-luxury-400 transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="#"
-                className="text-hotel-400 hover:text-luxury-400 transition-colors"
-                aria-label="YouTube"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <span className="mr-2 text-sm text-hotel-400">Follow us:</span>
+              {socialLabels.map((social) => (
+                <span
+                  key={social.label}
+                  className="inline-flex items-center gap-2 text-sm text-hotel-300"
+                >
+                  <social.icon className="h-4 w-4 text-luxury-400" />
+                  {social.label}
+                </span>
+              ))}
             </div>
 
-            {/* Awards */}
             <div className="flex items-center space-x-2">
               <div className="flex">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
-                    className="w-4 h-4 fill-luxury-400 text-luxury-400"
+                    className="h-4 w-4 fill-luxury-400 text-luxury-400"
                   />
                 ))}
               </div>
